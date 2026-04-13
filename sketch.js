@@ -1,6 +1,12 @@
 let cam;
 let edgeShader;
 let threshold = 0.15;
+let showPolylines = false;
+let polylines = [];
+let skeletonWorker;
+let workerBusy = false;
+let sampleW = 80;
+let sampleH = 60;
 
 function preload() {
   edgeShader = loadShader('edge.vert', 'edge.frag');
@@ -14,22 +20,79 @@ function setup() {
   cam = createCapture(VIDEO);
   cam.size(640, 480);
   cam.hide();
+
+  // Initialize web worker
+  skeletonWorker = new Worker('skeleton.worker.js');
+  skeletonWorker.onmessage = function(e) {
+    polylines = e.data.polylines;
+    workerBusy = false;
+  };
 }
 
 function draw() {
+  // Always render edge detection first
   shader(edgeShader);
-
-  // Pass webcam texture
   edgeShader.setUniform('tex0', cam);
-
-  // Texel size for sampling neighbors (1 pixel in UV space)
   edgeShader.setUniform('texelSize', [1.0 / cam.width, 1.0 / cam.height]);
-
-  // Edge detection threshold
   edgeShader.setUniform('threshold', threshold);
-
-  // Draw fullscreen quad using rect (proper UV mapping)
   rect(-width / 2, -height / 2, width, height);
+
+  if (showPolylines) {
+    // Send frame to worker if not busy
+    if (!workerBusy) {
+      workerBusy = true;
+      sendFrameToWorker();
+    }
+
+    // Draw current polylines
+    drawPolylines();
+  }
+}
+
+function sendFrameToWorker() {
+  loadPixels();
+
+  // Build binary image at reduced resolution
+  let binaryImg = new Array(sampleW * sampleH);
+  let scaleX = width / sampleW;
+  let scaleY = height / sampleH;
+
+  for (let y = 0; y < sampleH; y++) {
+    for (let x = 0; x < sampleW; x++) {
+      let srcX = Math.floor(x * scaleX);
+      let srcY = Math.floor(y * scaleY);
+      let srcIdx = (srcY * width + srcX) * 4;
+      binaryImg[y * sampleW + x] = pixels[srcIdx] > 128 ? 1 : 0;
+    }
+  }
+
+  skeletonWorker.postMessage({
+    binaryImg: binaryImg,
+    width: sampleW,
+    height: sampleH
+  });
+}
+
+function drawPolylines() {
+  resetShader();
+
+  let scaleX = width / sampleW;
+  let scaleY = height / sampleH;
+
+  stroke(0, 255, 0);
+  strokeWeight(2);
+  noFill();
+
+  for (let poly of polylines) {
+    if (poly.length < 2) continue;
+    beginShape();
+    for (let pt of poly) {
+      let x = pt[0] * scaleX - width / 2;
+      let y = pt[1] * scaleY - height / 2;
+      vertex(x, y);
+    }
+    endShape();
+  }
 }
 
 function windowResized() {
@@ -37,12 +100,17 @@ function windowResized() {
 }
 
 function keyPressed() {
-  // Adjust threshold with up/down arrows
   if (keyCode === UP_ARROW) {
     threshold = min(threshold + 0.02, 1.0);
     console.log('Threshold:', threshold.toFixed(2));
   } else if (keyCode === DOWN_ARROW) {
     threshold = max(threshold - 0.02, 0.01);
     console.log('Threshold:', threshold.toFixed(2));
+  } else if (keyCode === TAB) {
+    showPolylines = !showPolylines;
+    polylines = [];
+    workerBusy = false;
+    console.log('Mode:', showPolylines ? 'Polylines' : 'Edge Detection');
+    return false;
   }
 }
