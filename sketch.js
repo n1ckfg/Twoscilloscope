@@ -9,6 +9,7 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
+  textureMode(NORMAL);
 
   cam = createCapture(VIDEO);
   cam.size(640, 480);
@@ -27,8 +28,8 @@ function draw() {
   // Edge detection threshold
   edgeShader.setUniform('threshold', threshold);
 
-  // Draw fullscreen quad
-  quad(-1, -1, 1, -1, 1, 1, -1, 1);
+  // Draw fullscreen quad using rect (proper UV mapping)
+  rect(-width / 2, -height / 2, width, height);
 }
 
 function windowResized() {
