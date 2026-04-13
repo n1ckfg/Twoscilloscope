@@ -1,0 +1,103 @@
++ new
+* changed
+- removed
+
+////////////////////////////////////////////////////////////
+XYScope 3.0.0 (REV 5) - 21.02.2023
+
++ NEWER & IMPROVEDER buildWaves() technique (added -3, to those who like previous)
++ Added Hershey Fonts (single line) w/ many functions (textFont, textSize, textAlign, textPaths, textWidth, textLeading, multi-line text, ...)
++ Added circle() + square() to match p5/Processing
++ Added steps() for multiplier of segments between points
++ resetWaves() alias of waveReset(), to keep style of clearWaves() and buildWaves()
++ XYZ WaveTables are public to grab values for other usage
++ pan(left, right) to swap pans of channels incase cables physically swapped
++ box(), sphere(), ellipsoid(), torus() 3D primitives added
++ lissajous(), to draw such forms
++ primitives can be called without params for quick test, ie xy.circle()
++ audio recorder, to save visuals as .wav!
++ lots of new demos, sharing tricks/tips from past years playing with it
++ newly designed references as tutorial website
+
+* ellipse() + rect() now work with 3 params like Processing
+* ellipse()/circle() fixed connecting point
+* point() fixed 
+* more functions accept float for random/sin play
+* limitPath() improved to only draw necessary vector points
+* endShape() now has CLOSE
+* drawXY(), drawPath(), drawAudio(), accept r,g,b values for custom coloring
+* ellipseDetail() abs() for negative numbers
+
+
+////////////////////////////////////////////////////////////
+XYScope 2.2.0 (REV 4) - 20.12.2018
+
++ NEW & IMPROVED buildWaves() technique (added -2, to those who like previous)
++ Fixed Minim WaveTable bug that caused crash since REV 2 (thanks Hansi Raber!)
++ limitPath() only draw if shape within border from edges
++ Laser: RGB Laser compatibility (using 2x stereo audio pairs for RGB control)
++ Laser: stroke() to control RGB color
++ Laser: strokeFreq() to control RGB frequencies
++ Laser: strokeDash() to add dashes to RGB waves
++ Laser: spotKiller() to only draw if image bigger than spotKiller() size (default 20)
++ Laser: laserLPF() default low-pass-filter is 10k hz, use laserLPF() to customize
++ Examples: added xtra_obj + xtra_video + xtra_laser
+
+* minor vertex() code changes
+* minor changes to examples
+
+
+////////////////////////////////////////////////////////////
+XYScope 2.1.0 (REV 3) - 25.07.2018
+
++ Vectrex compatibility (custom aspect ratio and +/- 90° rotation)
++ Vectrex example
+
+* BuildWaves + drawXY to work with Vectrex mode
+
+
+////////////////////////////////////////////////////////////
+XYScope 2.0.0 (REV 2) - 08.05.2018
+
+Added/dropped/refactored enough features to need 2.0
+
++ Brand new drawing to waveform technique (smoother)! Prefer old way? use buildWaves(-1)
+  If points matches buffer (1024), previously technique is used to maintain speed.
++ debugView(), for seeing drawWaveform() to drawXY() relationship (thanks Hansi3D!)
++ waveSize() function for dynamically changing wavetable size
++ XYscope instance for custom sample rates (41000, 48000, 96000, 192000, etc)
++ waveReset() now public incase time-step of oscillators slip when changing freq()
+
+* Technique for adding z-axis, 
+* Refactored audio out, so minim filters (lowpass) can be used, see xtra_filters example 
+* Minor bugs in drawWaveform() rendering
+* Drawings collect as a shapesList vs arrayList, clever suggestion by Hansi3D
+* Stopped performing waveReset() on freq change, which preventing nice beam walk-around
+
+- XYscope instance with z-axis, now has dedicated function 
+- XYscope instance with int for mixerID, can change too often, select mixer by name
+- addPoint(), just use point()
+- wavePoints(set), new structure doesn't allow, use custom buildWaves()
+- sortPoints(), was a rough test, do within sketch instead
+- freqX(), freqY(), freqZ(), ampX(), ampY(), ampZ()
+  now combined into freq(), amp() for 1 + optional 2, 3 values
+
+////////////////////////////////////////////////////////////
+XYScope 1.0.2 (REV 1) - 11.09.2017
+
++ audioMix as instance output, enabling additive-synthesis
+
+
+////////////////////////////////////////////////////////////
+XYScope 1.0.1 (REV 1) - 91.08.2017
+
++ xtra_syphon example, similar to webcam, load syphon textures
+
+
+////////////////////////////////////////////////////////////
+XYScope 1.0.0 (REV 1) - 21.06.2017
+
+XYscope enters the world! 
+
++ Everything
+

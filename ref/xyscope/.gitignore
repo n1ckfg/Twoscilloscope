@@ -1,0 +1,12 @@
+distribution
+data
+lib
+test
+.DS_Store
+.project
+.classpath
+tmp
+/bin/
+_sandbox
+examples_removed
+.settings
