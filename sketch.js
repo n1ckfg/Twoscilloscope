@@ -1,5 +1,6 @@
 let cam;
 let edgeShader;
+let edgeBuffer;
 let threshold = 0.15;
 let showPolylines = false;
 let polylines = [];
@@ -17,11 +18,14 @@ function setup() {
   noStroke();
   textureMode(NORMAL);
 
+  edgeBuffer = createGraphics(640, 480, WEBGL);
+  edgeBuffer.pixelDensity(1);
+  edgeBuffer.noStroke();
+
   cam = createCapture(VIDEO);
   cam.size(640, 480);
   cam.hide();
 
-  // Initialize web worker
   skeletonWorker = new Worker('skeleton.worker.js');
   skeletonWorker.onmessage = function(e) {
     polylines = e.data.polylines;
@@ -30,39 +34,41 @@ function setup() {
 }
 
 function draw() {
-  // Always render edge detection first
-  shader(edgeShader);
+  if (!cam.width || !cam.height) return;
+
+  edgeBuffer.shader(edgeShader);
   edgeShader.setUniform('tex0', cam);
   edgeShader.setUniform('texelSize', [1.0 / cam.width, 1.0 / cam.height]);
   edgeShader.setUniform('threshold', threshold);
-  rect(-width / 2, -height / 2, width, height);
+  edgeBuffer.rect(-edgeBuffer.width / 2, -edgeBuffer.height / 2, edgeBuffer.width, edgeBuffer.height);
+
+  image(edgeBuffer, -width / 2, -height / 2, width, height);
 
   if (showPolylines) {
-    // Send frame to worker if not busy
     if (!workerBusy) {
       workerBusy = true;
       sendFrameToWorker();
     }
-
-    // Draw current polylines
     drawPolylines();
   }
 }
 
 function sendFrameToWorker() {
-  loadPixels();
+  edgeBuffer.loadPixels();
 
-  // Build binary image at reduced resolution
+  let bufW = edgeBuffer.width * edgeBuffer.pixelDensity();
+  let bufH = edgeBuffer.height * edgeBuffer.pixelDensity();
+
   let binaryImg = new Array(sampleW * sampleH);
-  let scaleX = width / sampleW;
-  let scaleY = height / sampleH;
+  let scaleX = bufW / sampleW;
+  let scaleY = bufH / sampleH;
 
   for (let y = 0; y < sampleH; y++) {
     for (let x = 0; x < sampleW; x++) {
       let srcX = Math.floor(x * scaleX);
       let srcY = Math.floor(y * scaleY);
-      let srcIdx = (srcY * width + srcX) * 4;
-      binaryImg[y * sampleW + x] = pixels[srcIdx] > 128 ? 1 : 0;
+      let srcIdx = (srcY * bufW + srcX) * 4;
+      binaryImg[y * sampleW + x] = edgeBuffer.pixels[srcIdx] > 128 ? 1 : 0;
     }
   }
 
