@@ -41,8 +41,8 @@ void main() {
   // Magnitude of gradient
   float edge = sqrt(gx*gx + gy*gy);
 
-  // Apply threshold for cleaner edges
-  edge = edge > threshold ? 1.0 : edge / threshold;
+  // Binary threshold: edge pixels are strictly black or white
+  edge = step(threshold, edge);
 
   gl_FragColor = vec4(vec3(edge), 1.0);
 }
