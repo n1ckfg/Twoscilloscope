@@ -6,8 +6,8 @@ let showPolylines = false;
 let polylines = [];
 let skeletonWorker;
 let workerBusy = false;
-let sampleW = 80;
-let sampleH = 60;
+let sampleW = 256; //80;
+let sampleH = 256; //60;
 
 function preload() {
   edgeShader = loadShader('edge.vert', 'edge.frag');
