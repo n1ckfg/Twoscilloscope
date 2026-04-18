@@ -47,5 +47,18 @@ void main() {
   // Binary threshold: edge pixels are strictly black or white
   edge = step(threshold, edge);
 
+  // Dilate edges (expand edge regions by 1 pixel)
+  float dilate = 0.0;
+  if (edge > 0.5) {
+    dilate = 1.0;
+  } else {
+    float left = texture2D(tex0, vTexCoord + vec2(-texelSize.x, 0.0)).r;
+    float right = texture2D(tex0, vTexCoord + vec2(texelSize.x, 0.0)).r;
+    float up = texture2D(tex0, vTexCoord + vec2(0.0, -texelSize.y)).r;
+    float down = texture2D(tex0, vTexCoord + vec2(0.0, texelSize.y)).r;
+    dilate = 1.0 - ((left > 0.5 || right > 0.5 || up > 0.5 || down > 0.5) ? 1.0 : 0.0);
+  }
+  edge = dilate;
+
   gl_FragColor = vec4(vec3(edge), 1.0);
 }
