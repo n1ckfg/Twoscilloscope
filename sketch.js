@@ -42,14 +42,15 @@ function draw() {
   edgeShader.setUniform('threshold', threshold);
   edgeBuffer.rect(-edgeBuffer.width / 2, -edgeBuffer.height / 2, edgeBuffer.width, edgeBuffer.height);
 
-  image(edgeBuffer, -width / 2, -height / 2, width, height);
-
   if (showPolylines) {
+    background(0);
     if (!workerBusy) {
       workerBusy = true;
       sendFrameToWorker();
     }
     drawPolylines();
+  } else {
+    image(edgeBuffer, -width / 2, -height / 2, width, height);
   }
 }
 
