@@ -4,16 +4,15 @@ let edgeBuffer;
 let threshold = 0.15;
 let showPolylines = false;
 let polylines = [];
-let skeletonWorker;
-let workerBusy = false;
-let sampleW = 256; //80;
-let sampleH = 256; //60;
+let traceWasm = null;
+let sampleW = 256;
+let sampleH = 256;
 
 function preload() {
   edgeShader = loadShader('edge.vert', 'edge.frag');
 }
 
-function setup() {
+async function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
   textureMode(NORMAL);
@@ -26,15 +25,12 @@ function setup() {
   cam.size(640, 480);
   cam.hide();
 
-  skeletonWorker = new Worker('skeleton.worker.js');
-  skeletonWorker.onmessage = function(e) {
-    polylines = e.data.polylines;
-    workerBusy = false;
-  };
+  // Load WASM skeleton tracer
+  traceWasm = await TraceSkeleton.load();
 }
 
 function draw() {
-  if (!cam.width || !cam.height) return;
+  if (!cam.width || !cam.height || !traceWasm) return;
 
   edgeBuffer.shader(edgeShader);
   edgeShader.setUniform('tex0', cam);
@@ -44,23 +40,21 @@ function draw() {
 
   if (showPolylines) {
     background(0);
-    if (!workerBusy) {
-      workerBusy = true;
-      sendFrameToWorker();
-    }
+    traceFrame();
     drawPolylines();
   } else {
     image(edgeBuffer, -width / 2, -height / 2, width, height);
   }
 }
 
-function sendFrameToWorker() {
+function traceFrame() {
   edgeBuffer.loadPixels();
 
   let bufW = edgeBuffer.width * edgeBuffer.pixelDensity();
   let bufH = edgeBuffer.height * edgeBuffer.pixelDensity();
 
-  let binaryImg = new Array(sampleW * sampleH);
+  // Build binary char string for WASM
+  let str = "";
   let scaleX = bufW / sampleW;
   let scaleY = bufH / sampleH;
 
@@ -69,15 +63,13 @@ function sendFrameToWorker() {
       let srcX = Math.floor(x * scaleX);
       let srcY = Math.floor(y * scaleY);
       let srcIdx = (srcY * bufW + srcX) * 4;
-      binaryImg[y * sampleW + x] = edgeBuffer.pixels[srcIdx] > 128 ? 1 : 0;
+      str += edgeBuffer.pixels[srcIdx] > 128 ? "\1" : "\0";
     }
   }
 
-  skeletonWorker.postMessage({
-    binaryImg: binaryImg,
-    width: sampleW,
-    height: sampleH
-  });
+  // Trace skeleton using WASM
+  let result = traceWasm.fromCharString(str, sampleW, sampleH);
+  polylines = result.polylines;
 }
 
 function drawPolylines() {
@@ -116,7 +108,6 @@ function keyPressed() {
   } else if (keyCode === TAB) {
     showPolylines = !showPolylines;
     polylines = [];
-    workerBusy = false;
     console.log('Mode:', showPolylines ? 'Polylines' : 'Edge Detection');
     return false;
   }
