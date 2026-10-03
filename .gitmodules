@@ -1,0 +1,3 @@
+[submodule "openframeworks/ofxTwoscilloscope"]
+	path = openframeworks/ofxTwoscilloscope
+	url = https://github.com/n1ckfg/ofxTwoscilloscope
