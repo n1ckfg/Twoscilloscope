@@ -1,0 +1,49 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    color: #a0a0a0;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+}
+
+/* the canvas, with the text and the panel on top of it */
+#app {
+    position: relative;
+}
+
+#hud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+}
+
+/* text placed like ofDrawBitmapString(): left, top is set from the baseline */
+.label {
+    position: absolute;
+    font: 13px/16px monospace;
+    white-space: pre;
+}
+
+/* ofDrawBitmapStringHighlight() */
+.label.highlight {
+    color: #fff;
+    background: #000;
+    padding: 2px 4px;
+    margin-left: -4px;
+}
+
+/* the effect panel, at the top left like the oF examples' ofxGui */
+#app .lil-gui.root {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    max-height: calc(100% - 20px);
+    overflow-y: auto;
+    --font-family: monospace;
+    --font-size: 11px;
+}

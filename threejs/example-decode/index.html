@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>three.twoscilloscope: audio -> vectors</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link type="text/css" rel="stylesheet" href="../common/css/main.css">
+    </head>
+
+    <body>
+        <div id="app" style="width: 1024px; height: 600px;">
+            <div id="hud"></div>
+        </div>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "../common/js/libraries/threejs/three.module.js",
+                    "three/addons/": "../common/js/libraries/threejs/addons/",
+                    "twoscilloscope": "../common/js/libraries/twoscilloscope/Twoscilloscope.js"
+                }
+            }
+        </script>
+
+        <script type="module" src="./main.js"></script>
+    </body>
+
+</html>
