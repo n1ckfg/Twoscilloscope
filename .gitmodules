@@ -1,3 +1,6 @@
 [submodule "openframeworks/ofxTwoscilloscope"]
 	path = openframeworks/ofxTwoscilloscope
 	url = https://github.com/n1ckfg/ofxTwoscilloscope
+[submodule "processing/TwoscilloscopeP5"]
+	path = processing/TwoscilloscopeP5
+	url = https://github.com/n1ckfg/TwoscilloscopeP5
