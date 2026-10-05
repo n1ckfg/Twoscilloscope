@@ -309,7 +309,10 @@ renderer.setAnimationLoop(() => {
     animate();
 });
 
+// Keys work wherever the focus is: lil-gui stops keys from leaving its panel,
+// so listen before it does (capture), but leave its text fields their keys.
 window.addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLInputElement) return;
     const key = e.key;
     if (key.length === 1 && '1234'.includes(key)) {
         sourceIndex = Number(key) - 1;
@@ -338,7 +341,7 @@ window.addEventListener('keydown', (e) => {
         WavFile.save(file, player.render(4, 3));
         status = 'saved ' + file;
     }
-});
+}, true);
 
 // the mouse, on the canvas the shapes live on
 function toCanvas(e) {

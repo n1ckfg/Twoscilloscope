@@ -164,7 +164,17 @@ function animate() {
     renderer.render(stage, camera);
 }
 
-renderer.setAnimationLoop(animate);
+// at most 60 frames a second, as ofSetFrameRate(60) in the oF example:
+// the beam's afterglow fades once a frame, so its brightness depends on it
+let lastTime = performance.now(), behind = 0;
+renderer.setAnimationLoop(() => {
+    const now = performance.now();
+    behind = Math.min(behind + now - lastTime, 1000 / 60);
+    lastTime = now;
+    if (behind < 1000 / 60 - 2) return;
+    behind -= 1000 / 60;
+    animate();
+});
 
 function toggleLiveInput() {
     liveInput = !liveInput;

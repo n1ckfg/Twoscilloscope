@@ -240,7 +240,7 @@ function animate() {
     statusLabel.textContent = status || audioStatus();
 }
 
-// at most 60 frames a second, as the oF example
+// at most 60 frames a second, as ofSetFrameRate(60) in the oF example
 let lastTime = performance.now(), behind = 0;
 renderer.setAnimationLoop(() => {
     const now = performance.now();
@@ -284,7 +284,10 @@ function saveLatk(filename) {
     return zip.generateAsync({ type: 'blob', compression: 'DEFLATE' }).then((blob) => Twoscilloscope.saveBlob(blob, filename));
 }
 
+// Keys work wherever the focus is: lil-gui stops keys from leaving its panel,
+// so listen before it does (capture), but leave its text fields their keys.
 window.addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLInputElement) return;
     const key = e.key;
     if (key === 'l') {
         view = (view + 1) % 3;
@@ -322,4 +325,4 @@ window.addEventListener('keydown', (e) => {
             status = 'saved test.latk';
         });
     }
-});
+}, true);
