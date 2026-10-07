@@ -70,14 +70,18 @@ also MIT licensed.
 
 'use strict';
 
-if (typeof p5 === 'undefined') {
+// A worker has no document and no p5. Only the audio half (the effects, the
+// decoder, WAV files) is of use there, and the classes go on its global scope.
+const IN_WORKER = typeof document === 'undefined';
+
+if (typeof p5 === 'undefined' && !IN_WORKER) {
     console.warn('p5.twoscilloscope: load p5.js before this library');
 }
 
 const VERSION = '1.0.0';
 
 // where this file lives, so the Hershey fonts can be found next to it
-const SCRIPT_URL = document.currentScript && document.currentScript.src ? document.currentScript.src : window.location.href;
+const SCRIPT_URL = !IN_WORKER && document.currentScript && document.currentScript.src ? document.currentScript.src : globalThis.location.href;
 
 //==============================================================
 // helpers
@@ -5384,7 +5388,7 @@ const Twoscilloscope = {
     hsbToRgb
 };
 
-Object.assign(window, {
+Object.assign(globalThis, {
     Twoscilloscope,
     XYscope, XYWavetable, HersheyFont,
     Oscilloscope, OsciMesh, StreamResampler, XYDecoder, XYDecoderSettings, XYPlayer, XYAudioInput,
